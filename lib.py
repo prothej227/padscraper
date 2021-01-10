@@ -44,4 +44,4 @@ def getPageNum(url):
             n = n + 1
         else:
             break
-    return n
+    return n-1
