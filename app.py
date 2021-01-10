@@ -2,13 +2,14 @@
 # Author: Journel Cabrillos
 # Email: journelcabrillos@protonmail.com
 
-from lib import soup, getBody, getPageUrl, getChapTitle, getPageNum
+from lib import getTitle, soup, getBody, getPageUrl, getChapTitle, getPageNum
 
 story_url = input("Input url: ")
 
-def urlList(url):
+def storyMeta(url):
     local_soup = soup(url)
-    return getPageUrl(local_soup)
+    title = str(getTitle(local_soup))
+    return [list(getPageUrl(local_soup)), title]
 
 def scrapePage(pageNum, url):
     txt = ""
@@ -19,21 +20,28 @@ def scrapePage(pageNum, url):
     return txt
 
 def initScrape(urlList):
-    txt = ""
+    txt = """
+============================================
+    Story/Book Title: {}
+    Encoded: PadScraper v1
+    Developer: Journel Cabrillos
+============================================\n""".format(str(storyMeta(story_url)[1]))
 
     for i in range(len(urlList)):
-        url = "https://www.wattpad.com" + urlList[i]
+        url = "https://www.wattpad.com" + str(urlList[i])
         new_soup = soup(url)
         pageNum = getPageNum(url)
         print("Scraping Chapter[{}]: {}".format((i+1), url))
-        txt += str(getChapTitle(new_soup) + "\n-------------------------\n")
+        txt += """\n--------------------------------\n {} \n--------------------------------\n""".format(str(getChapTitle(new_soup)).rstrip())
         txt += scrapePage(pageNum, url)
 
     return txt
 
 def writeTxt(text):
-    f = open("padScrape.txt", "a")
+    fname = '%s' % story_url
+    fname = fname.replace("https://www.wattpad.com/story/", "").replace("/", "").replace('\'', "") + ".txt"
+    f = open(fname, "a")
     f.write(text)
     f.close()
 
-writeTxt(initScrape(urlList(story_url)))
+writeTxt(initScrape(storyMeta(story_url)[0]))

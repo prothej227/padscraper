@@ -15,8 +15,7 @@ def soup(url):
 
 # Get Story Title
 def getTitle(soup):
-    mainTitle = soup.find(class_="title_h5")
-    return mainTitle
+    return str(soup.find("h1").get_text()).rstrip()
 
 # Get Chapter Title
 def getChapTitle(soup):
