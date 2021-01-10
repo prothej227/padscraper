@@ -24,13 +24,24 @@ def getChapTitle(soup):
     
 # Returns a clean text containing the story paragraphs    
 def getBody(soup):
-    return str(soup.find(class_="col-xs-10 col-xs-offset-1 col-sm-10 col-sm-offset-1 col-md-7 col-md-offset-1 col-lg-6 col-lg-offset-3 panel panel-reading").get_text()).replace("                          ", "")
+    try:
+        return str(soup.find(class_="col-xs-10 col-xs-offset-1 col-sm-10 col-sm-offset-1 col-md-7 col-md-offset-1 col-lg-6 col-lg-offset-3 panel panel-reading").get_text()).replace("                          ", "")
+    except Exception:
+        pass
+    return ""
 
 # Get Page URLs
 def getPageUrl(soup):
-    tabOfContents = soup.find_all(class_="on-navigate")
-    return [x.attrs['href'] for x in tabOfContents if tabOfContents.index(x) in range(31, len(tabOfContents)- 26)]
+    tabOfContents = soup.find_all(class_="on-navigate-part")
+    return [x.attrs['href'] for x in tabOfContents]
 
-# 
-def getPageNum(soup):
-    return None
+# Iterate through page numbers of each chapter
+def getPageNum(url):
+    n = 1
+    while True:
+        zsoup = soup(url + "/page/" + str(n))
+        if  zsoup.find(attrs={"data-page-number": n}) != None:
+            n = n + 1
+        else:
+            break
+    return n

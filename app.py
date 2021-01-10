@@ -1,18 +1,30 @@
-from lib import soup, getBody, getPageUrl, getChapTitle
+# Python PadScraper - Scrapes Wattpad Stories into PDF / ePUB
+# Author: Journel Cabrillos
+# Email: journelcabrillos@protonmail.com
 
-url = "https://www.wattpad.com/477671236-sherlock-holmes-a-study-in-scarlet-by-sir-arthur"
+from lib import soup, getBody, getPageUrl, getChapTitle, getPageNum
 
-def initScrape(url):
+def urlList(url):
+    local_soup = soup(url)
+    return getPageUrl(local_soup)
+
+def scrapePage(pageNum, url):
     txt = ""
-    new_soup = soup(url)
-    urlList = getPageUrl(new_soup)
-    txt += str(getBody(new_soup))
+    for z in range(pageNum):
+        new_soup = soup(url + "/page/" + str(z))        
+        print("Scraping Page: " + str(z+1))
+        txt += str(getBody(new_soup))
+        return txt
 
-    for i in range(1, len(urlList)):
-        nextPageUrl = str("https://www.wattpad.com" + urlList[i])
-        print("Scraping Chapter[{}]: {}".format(i+1, nextPageUrl))
-        lsoup = soup(nextPageUrl)
-        txt +=  str(getBody(lsoup))
+def initScrape(urlList):
+    txt = ""
+
+    for i in range(len(urlList)):
+        url = "https://www.wattpad.com" + urlList[i]
+        new_soup = soup(url)
+        pageNum = getPageNum(url)
+        print("Scraping Chapter[{}]: {}".format((i+1), url))
+        txt += scrapePage(pageNum, url)
 
     return txt
 
@@ -21,4 +33,4 @@ def writeTxt(text):
     f.write(text)
     f.close()
 
-writeTxt(initScrape(url))
+writeTxt(initScrape(urlList("https://www.wattpad.com/story/6141477-a-study-in-love-a-johnlock-fanfiction")))
